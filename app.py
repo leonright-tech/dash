@@ -20,14 +20,18 @@ def load_data():
                 return float(value.replace("K", "")) * 1_000
         return float(value)  # Ensure numeric format
 
-    # Fix "Top 20 Suppliers (Spend)" values
-    sheet_name = "Top 20 Suppliers (Spend)"
-    column_name = "Total_Spend_EUR"  # VERIFIED FROM YOUR FILE
+    # List of sheets & columns to fix
+    sheets_to_fix = {
+        "Top 20 Suppliers (Spend)": "Total_Spend_EUR",
+        "Time Trends": "Total_Spend_EUR"  # VERIFIED FROM YOUR FILE
+    }
 
-    if sheet_name in df_dict:
-        df_dict[sheet_name][column_name] = (
-            df_dict[sheet_name][column_name].apply(convert_to_number)
-        )
+    # Apply fix to each sheet
+    for sheet_name, column_name in sheets_to_fix.items():
+        if sheet_name in df_dict and column_name in df_dict[sheet_name]:
+            df_dict[sheet_name][column_name] = (
+                df_dict[sheet_name][column_name].apply(convert_to_number)
+            )
 
     return df_dict  # Return the cleaned data dictionary
 
