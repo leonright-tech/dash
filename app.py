@@ -8,9 +8,31 @@ st.title("📊 Procurement Dashboard - ECharts Version")
 
 @st.cache_data
 def load_data():
-    return pd.read_excel("data.xlsx", sheet_name=None)  # Load all sheets
+    # Load all sheets into a dictionary
+    df_dict = pd.read_excel("data.xlsx", sheet_name=None)
 
-df_dict = load_data()  # Store the dictionary of DataFrames
+    # Define conversion function
+    def convert_to_number(value):
+        if isinstance(value, str):
+            if "M" in value:
+                return float(value.replace("M", "")) * 1_000_000
+            elif "K" in value:
+                return float(value.replace("K", "")) * 1_000
+        return float(value)  # Ensure numeric format
+
+    # Fix "Top 20 Suppliers (Spend)" values
+    sheet_name = "Top 20 Suppliers (Spend)"
+    column_name = "Total_Spend_EUR"  # VERIFIED FROM YOUR FILE
+
+    if sheet_name in df_dict:
+        df_dict[sheet_name][column_name] = (
+            df_dict[sheet_name][column_name].apply(convert_to_number)
+        )
+
+    return df_dict  # Return the cleaned data dictionary
+
+# Load the cleaned data
+df_dict = load_data()
 
 # ✅ Extract Data for Each Chart
 df_daily_orders = df_dict['Daily Orders']
