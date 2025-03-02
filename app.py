@@ -107,7 +107,7 @@ with col6:
     option_top_suppliers = {
         "backgroundColor": background_color,
         "color": custom_colors,
-        "tooltip": {"trigger": "axis", "backgroundColor": tooltip_background},
+        "tooltip": {"trigger": "axis", "position": "top", "backgroundColor": tooltip_background},
         "xAxis": {"type": "category", "data": df_top_suppliers_spend['SUPPLIER'].tolist(), "axisLabel": {"color": text_color}},
         "yAxis": {"type": "value", "axisLabel": {"color": text_color}},
         "series": [{"name": "Total Spend", "data": df_top_suppliers_spend['Total_Spend_EUR'].tolist(), "type": "bar"}]
