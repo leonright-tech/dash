@@ -2,6 +2,10 @@ import streamlit as st
 import pandas as pd
 from streamlit_echarts import st_echarts
 
+# ✅ Streamlit Layout - Full Page
+st.set_page_config(layout="wide")
+st.title("📊 Procurement Dashboard - ECharts Version")
+
 @st.cache_data
 def load_data():
     return pd.read_excel("data.xlsx", sheet_name=None)  # Load all sheets
@@ -32,10 +36,6 @@ axis_color = "#888"
 text_color = "#fff"
 grid_color = "#444"
 tooltip_background = "#333"
-
-# ✅ Streamlit Layout - Full Page
-st.set_page_config(layout="wide")
-st.title("📊 Procurement Dashboard - ECharts Version")
 
 # ✅ Layout: 2 Rows, 4 Charts per Row
 col1, col2, col3, col4 = st.columns(4)
