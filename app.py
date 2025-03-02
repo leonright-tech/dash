@@ -2,12 +2,11 @@ import streamlit as st
 import pandas as pd
 from streamlit_echarts import st_echarts
 
-# Load the static file
 @st.cache_data
 def load_data():
-    return pd.read_excel("data.xlsx")  # Ensure the file is in the same repo
+    return pd.read_excel("data.xlsx", sheet_name=None)  # Load all sheets
 
-df = load_data()
+df_dict = load_data()  # Store the dictionary of DataFrames
 
 # ✅ Extract Data for Each Chart
 df_daily_orders = df_dict['Daily Orders']
