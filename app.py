@@ -1,5 +1,7 @@
 import streamlit as st
 import pandas as pd
+import boto3
+import io
 from streamlit_echarts import st_echarts
 
 # ✅ Streamlit Layout - Full Page
@@ -8,35 +10,37 @@ st.title("📊 Procurement Dashboard - ECharts Version")
 
 @st.cache_data
 def load_data():
-    # Load all sheets into a dictionary
-    df_dict = pd.read_excel("data.xlsx", sheet_name=None)
+    # ✅ AWS S3 Configuration
+    BUCKET_NAME = "proc.data"
+    PROCESSED_FOLDER = "ProcessedData"
 
-    # Define conversion function
-    def convert_to_number(value):
-        if isinstance(value, str):
-            if "M" in value:
-                return float(value.replace("M", "")) * 1_000_000
-            elif "K" in value:
-                return float(value.replace("K", "")) * 1_000
-        return float(value)  # Ensure numeric format
+    # ✅ Initialize S3 client
+    s3 = boto3.client('s3')
 
-    # List of sheets & columns to fix
-    sheets_to_fix = {
-        "Top 20 Suppliers (Spend)": "Total_Spend_EUR",
-        "Time Trends": "Total_Spend_EUR"  # VERIFIED FROM YOUR FILE
-    }
+    # ✅ Fetch latest processed Excel file from S3
+    response = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=f"{PROCESSED_FOLDER}/")
+    files = response.get('Contents', [])
 
-    # Apply fix to each sheet
-    for sheet_name, column_name in sheets_to_fix.items():
-        if sheet_name in df_dict and column_name in df_dict[sheet_name]:
-            df_dict[sheet_name][column_name] = (
-                df_dict[sheet_name][column_name].apply(convert_to_number)
-            )
+    # Filter only Excel files
+    excel_files = [f for f in files if f['Key'].endswith(('.xlsx', '.xls'))]
 
-    return df_dict  # Return the cleaned data dictionary
+    if not excel_files:
+        st.error("❌ No processed Excel data found in S3.")
+        return None
+
+    # Get the latest Excel file based on LastModified timestamp
+    latest_file = max(excel_files, key=lambda x: x['LastModified'])['Key']
+
+    # ✅ Download file into memory
+    file_obj = s3.get_object(Bucket=BUCKET_NAME, Key=latest_file)
+    df_dict = pd.read_excel(io.BytesIO(file_obj['Body'].read()), sheet_name=None)
+
+    return df_dict  # ✅ Return the cleaned data dictionary
 
 # Load the cleaned data
 df_dict = load_data()
+if df_dict is None:
+    st.stop()
 
 # ✅ Extract Data for Each Chart
 df_daily_orders = df_dict['Daily Orders']
@@ -66,6 +70,7 @@ tooltip_background = "#333"
 # ✅ Layout: 2 Rows, 4 Charts per Row
 col1, col2, col3, col4 = st.columns(4)
 
+# 🛠️ Existing ECharts Visualizations (Unchanged)
 # 🔹 ROW 1: Order Trends + Spending Breakdown
 with col1:
     st.markdown("### Daily Orders")
@@ -109,7 +114,7 @@ with col4:
         "backgroundColor": background_color,
         "color": custom_colors,
         "tooltip": {"trigger": "item", "formatter": "{b}: {d}%", "backgroundColor": tooltip_background},
-        "series": [{"type": "pie", "radius": ["40%", "70%"], "label": {"show": False}, 
+        "series": [{"type": "pie", "radius": ["40%", "70%"], "label": {"show": False},
                     "data": [{"value": v, "name": n} for v, n in zip(df_spending_distribution['PO_AMOUNT'], df_spending_distribution['TYPE'])]}]
     }
     st_echarts(option_spending, height="400px")
@@ -123,7 +128,7 @@ with col5:
         "backgroundColor": background_color,
         "color": custom_colors,
         "tooltip": {"trigger": "item", "formatter": "{b}: {d}%", "backgroundColor": tooltip_background},
-        "series": [{"type": "pie", "radius": ["40%", "70%"], "label": {"show": False}, 
+        "series": [{"type": "pie", "radius": ["40%", "70%"], "label": {"show": False},
                     "data": [{"value": v, "name": n} for v, n in zip(df_buyer_analysis['Total_Spending_EUR'], df_buyer_analysis['BUYER'])]}]
     }
     st_echarts(option_buyer, height="400px")
