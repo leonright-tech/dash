@@ -13,7 +13,7 @@ if "refresh_triggered" not in st.session_state:
     st.session_state.refresh_triggered = False
 
 # ✅ Refresh Button
-if st.button("🔄 Refresh Data"):
+if st.button("🔄 Refresh Data (Disabled)", disabled=True):
     st.session_state.refresh_triggered = True  # ✅ Mark refresh as triggered
     st.rerun()  # ✅ Force Streamlit to reload
 
