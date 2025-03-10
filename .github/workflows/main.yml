@@ -5,7 +5,7 @@ on:
     branches:
       - main
   schedule:
-    - cron: '0 * * * *'  # Runs every hour (Modify as needed)
+- cron: '0 0 1 * *'  # Runs at 00:00 (midnight) on the 1st day of every month
 
 jobs:
   deploy:
