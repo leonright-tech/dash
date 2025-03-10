@@ -22,7 +22,7 @@ s3 = boto3.client('s3',
 )
 
     # ✅ Fetch latest processed Excel file from S3
-    response = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=f"{PROCESSED_FOLDER}/")
+    response = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=f"{PROCESSED_FOLDER}/)
     files = response.get('Contents', [])
 
     # Filter only Excel files
