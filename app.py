@@ -34,7 +34,7 @@ def load_data():
         return None
         
     if st.button("🔄 Refresh Data"):
-    st.experimental_rerun()
+        st.experimental_rerun()
     
     # Get the latest Excel file based on LastModified timestamp
     latest_file = max(excel_files, key=lambda x: x['LastModified'])['Key']
