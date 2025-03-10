@@ -32,7 +32,10 @@ def load_data():
     if not excel_files:
         st.error("❌ No processed Excel data found in S3.")
         return None
-
+        
+    if st.button("🔄 Refresh Data"):
+    st.experimental_rerun()
+    
     # Get the latest Excel file based on LastModified timestamp
     latest_file = max(excel_files, key=lambda x: x['LastModified'])['Key']
 
