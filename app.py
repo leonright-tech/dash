@@ -10,7 +10,7 @@ st.title("📊 Procurement Dashboard - ECharts Version")
 
 # ✅ Add the Refresh Button OUTSIDE the cached function
 if st.button("🔄 Refresh Data"):
-    st.experimental_rerun()
+    st.rerun()  # ✅ Use `st.rerun()` instead of `st.experimental_rerun()`
 
 @st.cache_data
 def load_data():
