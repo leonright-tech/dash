@@ -14,8 +14,12 @@ def load_data():
     BUCKET_NAME = "proc.data"
     PROCESSED_FOLDER = "ProcessedData"
 
-    # ✅ Initialize S3 client
-    s3 = boto3.client('s3')
+# ✅ Initialize S3 client with credentials from Streamlit secrets
+s3 = boto3.client('s3',
+    aws_access_key_id=st.secrets["AWS_ACCESS_KEY"],
+    aws_secret_access_key=st.secrets["AWS_SECRET_KEY"],
+    region_name=st.secrets["AWS_REGION"]
+)
 
     # ✅ Fetch latest processed Excel file from S3
     response = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=f"{PROCESSED_FOLDER}/")
