@@ -8,6 +8,10 @@ from streamlit_echarts import st_echarts
 st.set_page_config(layout="wide")
 st.title("📊 Procurement Dashboard - ECharts Version")
 
+# ✅ Add the Refresh Button OUTSIDE the cached function
+if st.button("🔄 Refresh Data"):
+    st.experimental_rerun()
+
 @st.cache_data
 def load_data():
     # ✅ AWS S3 Configuration
@@ -32,9 +36,6 @@ def load_data():
     if not excel_files:
         st.error("❌ No processed Excel data found in S3.")
         return None
-        
-    if st.button("🔄 Refresh Data"):
-        st.experimental_rerun()
     
     # Get the latest Excel file based on LastModified timestamp
     latest_file = max(excel_files, key=lambda x: x['LastModified'])['Key']
