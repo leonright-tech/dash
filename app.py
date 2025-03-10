@@ -18,7 +18,7 @@ if st.button("🔄 Refresh Data (Disabled)", disabled=True):
     st.rerun()  # ✅ Force Streamlit to reload
     
 # @st.cache_data(ttl=60000)  # ✅ Disable caching, always fetch fresh data
-  def load_data():
+def load_data():
     # ✅ AWS S3 Configuration
     BUCKET_NAME = "proc.data"
     PROCESSED_FOLDER = "ProcessedData"
