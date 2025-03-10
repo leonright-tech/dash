@@ -8,9 +8,14 @@ from streamlit_echarts import st_echarts
 st.set_page_config(layout="wide")
 st.title("📊 Procurement Dashboard - ECharts Version")
 
-# ✅ Add the Refresh Button OUTSIDE the cached function
+# ✅ Use session state to detect button clicks properly
+if "refresh_triggered" not in st.session_state:
+    st.session_state.refresh_triggered = False
+
+# ✅ Refresh Button
 if st.button("🔄 Refresh Data"):
-    st.rerun()  # ✅ Use `st.rerun()` instead of `st.experimental_rerun()`
+    st.session_state.refresh_triggered = True  # ✅ Mark refresh as triggered
+    st.rerun()  # ✅ Force Streamlit to reload
 
 @st.cache_data
 def load_data():
