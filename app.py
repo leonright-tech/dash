@@ -1,36 +1,37 @@
+# Packages
 import streamlit as st
 import pandas as pd
 import boto3
 import io
 from streamlit_echarts import st_echarts
 
-# ✅ Streamlit Layout - Full Page
+# Streamlit Layout
 st.set_page_config(layout="wide")
 st.title("📊 Procurement Dashboard - ECharts Version")
 
-# ✅ Use session state to detect button clicks properly
+# Session state 
 if "refresh_triggered" not in st.session_state:
     st.session_state.refresh_triggered = False
 
-# ✅ Refresh Button
+# Refresh Button
 if st.button("🔄 Refresh Data (Disabled)", disabled=True):
-    st.session_state.refresh_triggered = True  # ✅ Mark refresh as triggered
-    st.rerun()  # ✅ Force Streamlit to reload
+    st.session_state.refresh_triggered = True  # Mark refresh as triggered
+    st.rerun()  # Streamlit reload
     
-# @st.cache_data(ttl=60000)  # ✅ Disable caching, always fetch fresh data
+# @st.cache_data(ttl=60000)  # Disable caching, fetch fresh data
 def load_data():
-    # ✅ AWS S3 Configuration
+    # AWS S3 Configuration
     BUCKET_NAME = "proc.data"
     PROCESSED_FOLDER = "ProcessedData"
 
-    # ✅ Initialize S3 client with credentials from Streamlit secrets
+    # Initialize S3 client with credentials from Streamlit Secrets
     s3 = boto3.client('s3',
         aws_access_key_id=st.secrets["AWS_ACCESS_KEY"],
         aws_secret_access_key=st.secrets["AWS_SECRET_KEY"],
         region_name=st.secrets["AWS_REGION"]
     )
 
-    # ✅ Fetch latest processed Excel file from S3
+    # Fetch latest processed Excel file from S3
     response = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=f"{PROCESSED_FOLDER}/")
 
     files = response.get('Contents', [])
@@ -45,18 +46,18 @@ def load_data():
     # Get the latest Excel file based on LastModified timestamp
     latest_file = max(excel_files, key=lambda x: x['LastModified'])['Key']
 
-    # ✅ Download file into memory
+    # Download file into memory
     file_obj = s3.get_object(Bucket=BUCKET_NAME, Key=latest_file)
     df_dict = pd.read_excel(io.BytesIO(file_obj['Body'].read()), sheet_name=None)
 
-    return df_dict  # ✅ Return the cleaned data dictionary
+    return df_dict  # Return the cleaned data dictionary
 
 # Load the cleaned data
 df_dict = load_data()
 if df_dict is None:
     st.stop()
 
-# ✅ Extract Data for Each Chart
+# Extract Data for Each Chart
 df_daily_orders = df_dict['Daily Orders']
 df_weekly_orders = df_dict['Weekly Orders']
 df_monthly_orders = df_dict['Monthly Orders']
@@ -66,14 +67,14 @@ df_top_suppliers_spend = df_dict['Top 20 Suppliers (Spend)']
 df_top_suppliers_pos = df_dict['Top 20 Suppliers (POs)']
 df_time_trends = df_dict['Time Trends']
 
-# ✅ Convert Month Numbers to Names
+# Convert Month Numbers to Names
 month_map = {1: "Jan", 2: "Feb", 3: "Mar", 4: "Apr", 5: "May", 6: "Jun",
              7: "Jul", 8: "Aug", 9: "Sep", 10: "Oct", 11: "Nov", 12: "Dec"}
 
 df_monthly_orders['MONTH'] = df_monthly_orders['MONTH'].map(month_map)
 df_time_trends['MONTH'] = df_time_trends['MONTH'].map(month_map)
 
-# ✅ Custom Colors & Styling (Dark Mode)
+# Custom Colors & Styling Dark Mode
 custom_colors = ["#5470c6", "#FF5400", "#6C757D", "#CAF0F8", "#03045E"]
 background_color = "#222831"
 axis_color = "#888"
@@ -81,11 +82,11 @@ text_color = "#fff"
 grid_color = "#444"
 tooltip_background = "#333"
 
-# ✅ Layout: 2 Rows, 4 Charts per Row
+# Layout: 2 Rows, 4 Charts per Row
 col1, col2, col3, col4 = st.columns(4)
 
-# 🛠️ Existing ECharts Visualizations (Unchanged)
-# 🔹 ROW 1: Order Trends + Spending Breakdown
+# Existing ECharts Visualizations (Unchanged)
+# ROW 1: Order Trends + Spending Breakdown
 with col1:
     st.markdown("### Daily Orders")
     option_daily_orders = {
@@ -133,7 +134,7 @@ with col4:
     }
     st_echarts(option_spending, height="400px")
 
-# 🔹 ROW 2: Buyer Analysis + Supplier Breakdown
+# ROW 2: Buyer Analysis + Supplier Breakdown
 col5, col6, col7, col8 = st.columns(4)
 
 with col5:
