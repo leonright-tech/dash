@@ -85,7 +85,7 @@ tooltip_background = "#333"
 # Layout: 2 Rows, 4 Charts per Row
 col1, col2, col3, col4 = st.columns(4)
 
-# Existing ECharts Visualizations (Unchanged)
+# ECharts Visualizations
 # ROW 1: Order Trends + Spending Breakdown
 with col1:
     st.markdown("### Daily Orders")
